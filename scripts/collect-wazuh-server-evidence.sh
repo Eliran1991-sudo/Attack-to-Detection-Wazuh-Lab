@@ -4,6 +4,8 @@ set -euo pipefail
 output='/tmp/wazuh-server-evidence.txt'
 alerts='/var/ossec/logs/alerts/alerts.json'
 
+rm -f "$output" /tmp/wazuh-lab-alerts.jsonl
+
 {
   echo "COLLECTED_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   echo "MANAGER_STATUS=$(systemctl is-active wazuh-manager)"
@@ -22,4 +24,3 @@ grep -Ei 'sysmon|powershell|WIN11-CLIENT|agent 001' "$alerts" | tail -n 80 \
   > /tmp/wazuh-lab-alerts.jsonl || true
 
 chown eliran:eliran "$output" /tmp/wazuh-lab-alerts.jsonl
-

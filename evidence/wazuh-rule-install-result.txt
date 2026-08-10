@@ -1,0 +1,4 @@
+RULE_FILE=/var/ossec/etc/rules/attack_to_detection_lab.xml
+RULE_ID=100100
+VALIDATION=Passed
+MANAGER_STATUS=active

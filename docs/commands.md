@@ -181,7 +181,47 @@ C:\LabTools\Sysmon\Sysmon64.exe `
 
 This keeps the useful PowerShell, command-shell, file, registry, and DNS telemetry while reducing background noise.
 
-## 10. Stop the lab when finished
+## 10. Install and validate the custom Wazuh rule
+
+The rule is stored in `config/wazuh-local-rules.xml`:
+
+```xml
+<rule id="100100" level="10">
+  <if_sid>92029</if_sid>
+  <field name="win.eventdata.image" type="pcre2">(?i)\\powershell\.exe$</field>
+  <field name="win.eventdata.commandLine" type="pcre2">(?i)run-safe-powershell-simulation\.ps1</field>
+  <description>Authorized lab: PowerShell attack-to-detection simulation observed</description>
+  <mitre><id>T1059.001</id></mitre>
+</rule>
+```
+
+Install it on the Wazuh manager:
+
+```bash
+sudo install -o root -g wazuh -m 0640 \
+  /tmp/wazuh-local-rules.xml \
+  /var/ossec/etc/rules/attack_to_detection_lab.xml
+
+sudo /var/ossec/bin/wazuh-analysisd -t
+sudo systemctl restart wazuh-manager
+systemctl is-active wazuh-manager
+```
+
+Validation result:
+
+```text
+Rule ID: 100100
+Validation: Passed
+Manager: active
+Real matches: 1
+Alert level: 10
+Agent: WIN11-CLIENT
+Sysmon Event ID: 1
+```
+
+Purpose: turn the endpoint telemetry into a reproducible, analyst-owned SIEM detection rather than relying only on generic rules.
+
+## 11. Stop the lab when finished
 
 Use guest shutdowns when convenient; do not force-stop a VM that is writing data:
 

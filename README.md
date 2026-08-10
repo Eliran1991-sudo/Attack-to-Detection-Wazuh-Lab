@@ -20,6 +20,8 @@ All three systems use the private `VMnet1` laboratory network. No public host or
 - `Sysmon64` and `WazuhSvc` are running automatically.
 - The Wazuh agent analyzes both the Sysmon and PowerShell Operational channels.
 - Wazuh agent `001` connected to `192.168.75.20:1514/tcp` and reported online.
+- Custom Wazuh rule `100100` passed configuration validation and loaded successfully.
+- A real event from `WIN11-CLIENT` matched rule `100100` at alert level `10`.
 - Safe PowerShell activity produced:
   - Sysmon Event ID `1`: process creation.
   - Sysmon Event ID `11`: file creation under `C:\Lab`.
@@ -34,6 +36,7 @@ All three systems use the private `VMnet1` laboratory network. No public host or
 | Marker-file creation | Sysmon Event ID 11 | Endpoint file activity under the lab path was captured |
 | Internal connection test | Sysmon Event ID 3 | Network telemetry recorded the Windows-to-Wazuh connection |
 | Kali reconnaissance | Nmap evidence | Windows was online; firewall filtering protected the tested services |
+| Custom SIEM detection | Wazuh rule 100100, level 10 | The PowerShell simulation produced a confirmed manager-side alert |
 
 ## Repository structure
 
@@ -58,4 +61,4 @@ Follow [docs/commands.md](docs/commands.md). Credentials are always supplied at 
 
 ## Skills demonstrated
 
-Windows telemetry, Sysmon, Wazuh agent configuration, Nmap reconnaissance, PowerShell, event triage, evidence handling, MITRE ATT&CK mapping, Git, and security-focused documentation.
+Windows telemetry, Sysmon, custom Wazuh rules, Wazuh agent configuration, Nmap reconnaissance, PowerShell, event triage, evidence handling, MITRE ATT&CK mapping, Git, and security-focused documentation.

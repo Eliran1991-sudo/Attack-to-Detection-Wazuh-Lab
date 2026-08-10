@@ -1,0 +1,14 @@
+Wazuh Custom Detection - Sanitized Evidence
+
+Timestamp: 2026-08-10 11:27:55 (Wazuh server time)
+Agent: WIN11-CLIENT
+Rule ID: 100100
+Level: 10
+Description: Authorized lab: PowerShell attack-to-detection simulation observed
+Sysmon Event ID: 1
+Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+Command: powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Users\Public\run-safe-powershell-simulation.ps1
+MITRE ATT&CK: T1059.001 - PowerShell
+
+Validation result: PASS
+The custom Wazuh rule matched the real Sysmon event received from agent 001.

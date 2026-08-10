@@ -1,0 +1,12 @@
+<group name="windows,sysmon,attack_to_detection_lab,">
+  <rule id="100100" level="10">
+    <if_sid>92029</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\powershell\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)run-safe-powershell-simulation\.ps1</field>
+    <description>Authorized lab: PowerShell attack-to-detection simulation observed</description>
+    <mitre>
+      <id>T1059.001</id>
+    </mitre>
+    <group>powershell,command_execution,authorized_lab,</group>
+  </rule>
+</group>
