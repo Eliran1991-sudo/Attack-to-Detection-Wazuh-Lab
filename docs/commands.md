@@ -1,125 +1,194 @@
 # Command-by-Command Build Log
 
-This document records the commands used to build and validate the lab. Secret values are represented by placeholders.
+This is the exact workflow used to build and validate the lab. Passwords are represented by placeholders and were supplied only at runtime.
 
-## 1. Start the existing Wazuh and Windows virtual machines
+## 1. Define the VMware paths
 
 ```powershell
 $vmrun = 'C:\Program Files (x86)\VMware\VMware Workstation\vmrun.exe'
 $wazuh = 'C:\Workspace\VMs\WAZUH-SIEM01\WAZUH-SIEM01.vmx'
 $client = 'C:\Workspace\VMs\WIN11-CLIENT\WIN11-CLIENT.vmx'
-
-& $vmrun start $wazuh gui
-& $vmrun start $client gui
-& $vmrun list
+$kali = 'C:\Workspace\VMs\KALI01\kali-linux-2026.2-vmware-amd64.vmwarevm\kali-linux-2026.2-vmware-amd64.vmx'
 ```
 
-Purpose: power on only the two machines required for the initial validation and confirm that VMware recognizes both as running.
+These variables avoid repeatedly typing long paths.
 
-## 2. Discover the guest IP addresses
+## 2. Start and identify the machines
 
 ```powershell
+& $vmrun start $wazuh nogui
+& $vmrun start $client nogui
+& $vmrun start $kali nogui
+& $vmrun list
+
 & $vmrun getGuestIPAddress $wazuh -wait
 & $vmrun getGuestIPAddress $client -wait
+& $vmrun getGuestIPAddress $kali -wait
 ```
 
-Validated results:
-
-- `WAZUH-SIEM01`: `192.168.75.20`
-- `WIN11-CLIENT`: `192.168.75.132`
-
-Purpose: prove that both guests are connected to the private `VMnet1` network.
-
-## 3. Verify the Wazuh endpoint
-
-Run on `WAZUH-SIEM01`:
-
-```bash
-sudo /var/ossec/bin/agent_control -i 001
-```
-
-Validated result:
+Validated addresses:
 
 ```text
-Agent ID: 001
-Agent Name: WIN11-CLIENT
-Status: Active
-Operating system: Microsoft Windows 11 Enterprise Evaluation
-Client version: Wazuh v4.14.7
+WAZUH-SIEM01  192.168.75.20
+WIN11-CLIENT  192.168.75.132
+KALI01        192.168.75.129
 ```
 
-Purpose: confirm that the Windows endpoint is enrolled, connected, and sending keep-alive messages.
-
-## 4. Identify the Windows laboratory account from inventory
-
-Create a read-only copy of the Wazuh endpoint inventory database:
-
-```bash
-sudo cp /var/ossec/queue/db/001.db /tmp/001-readonly.db
-sudo chown "$USER:$USER" /tmp/001-readonly.db
-```
-
-Query the user inventory with Python:
-
-```bash
-python3 - <<'PY'
-import sqlite3
-
-db = sqlite3.connect('/tmp/001-readonly.db')
-query = '''
-SELECT user_name, user_full_name, user_home, user_type
-FROM sys_users
-ORDER BY user_name
-'''
-
-for row in db.execute(query):
-    print(row)
-PY
-```
-
-Validated local account: `SOC Analyst` with profile path `C:\Users\SOC Analyst`.
-
-Purpose: identify the correct guest username without guessing accounts or modifying Windows.
-
-## 5. Authenticate for guest administration
-
-The next command will be executed only after the existing laboratory password is provided. The password is supplied at runtime and is never written to this repository.
+## 3. Download Sysmon from Microsoft and verify its signature
 
 ```powershell
-$credential = Get-Credential -UserName 'SOC Analyst' -Message 'Windows lab credentials'
+New-Item -ItemType Directory -Path '.\tools\Sysmon' -Force
+Invoke-WebRequest `
+  -Uri 'https://download.sysinternals.com/files/Sysmon.zip' `
+  -OutFile '.\tools\Sysmon.zip'
+Expand-Archive '.\tools\Sysmon.zip' '.\tools\Sysmon' -Force
+Get-AuthenticodeSignature '.\tools\Sysmon\Sysmon64.exe'
 ```
 
-Status: pending valid Windows laboratory credentials.
+Validated signer:
 
-## 6. Planned Sysmon installation
+```text
+Microsoft Windows Publisher / Microsoft Corporation
+Status: Valid
+```
 
-The following commands will be run inside the Windows guest after authentication and after downloading Sysmon from Microsoft Sysinternals:
+This prevents installation of a modified or unsigned executable.
+
+## 4. Stage the files in the Windows guest
 
 ```powershell
-Expand-Archive .\Sysmon.zip -DestinationPath C:\Tools\Sysmon -Force
-C:\Tools\Sysmon\Sysmon64.exe -accepteula -i C:\Tools\Sysmon\sysmonconfig.xml
-Get-Service Sysmon64
-wevtutil gl Microsoft-Windows-Sysmon/Operational
+$guestUser = 'SOC Analyst'
+$guestPassword = '<WINDOWS_LAB_PASSWORD>'
+
+& $vmrun -T ws -gu $guestUser -gp $guestPassword `
+  copyFileFromHostToGuest $client '.\tools\Sysmon.zip' 'C:\Users\Public\Sysmon.zip'
+
+& $vmrun -T ws -gu $guestUser -gp $guestPassword `
+  copyFileFromHostToGuest $client '.\config\sysmon-lab.xml' 'C:\Users\Public\sysmon-lab.xml'
+
+& $vmrun -T ws -gu $guestUser -gp $guestPassword `
+  copyFileFromHostToGuest $client `
+  '.\scripts\install-sysmon-and-configure-wazuh.ps1' `
+  'C:\Users\Public\install-sysmon-and-configure-wazuh.ps1'
 ```
 
-Purpose: install enhanced endpoint telemetry and verify that the Sysmon service and event channel are active.
+The placeholder is intentional: the actual password is not stored in Git.
 
-## 7. Planned Wazuh collection configuration
+## 5. Install Sysmon and configure Wazuh collection
 
-Add this local file block to the Windows Wazuh agent configuration:
+```powershell
+& $vmrun -T ws -gu $guestUser -gp $guestPassword `
+  runProgramInGuest $client `
+  'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe' `
+  -NoProfile -ExecutionPolicy Bypass `
+  -File 'C:\Users\Public\install-sysmon-and-configure-wazuh.ps1'
+```
+
+The script performs these actions:
+
+```powershell
+Get-AuthenticodeSignature C:\LabTools\Sysmon\Sysmon64.exe
+C:\LabTools\Sysmon\Sysmon64.exe -accepteula -i C:\LabTools\Sysmon\sysmon-lab.xml
+Restart-Service WazuhSvc
+Get-Service Sysmon64, WazuhSvc
+Get-WinEvent -ListLog 'Microsoft-Windows-Sysmon/Operational'
+```
+
+If Sysmon already exists, `-c` updates its configuration instead of reinstalling it. Only the Wazuh agent service is restarted; Windows is not restarted.
+
+The following Wazuh event channels were added:
 
 ```xml
 <localfile>
   <location>Microsoft-Windows-Sysmon/Operational</location>
   <log_format>eventchannel</log_format>
 </localfile>
+<localfile>
+  <location>Microsoft-Windows-PowerShell/Operational</location>
+  <log_format>eventchannel</log_format>
+</localfile>
 ```
 
-Then restart only the Wazuh agent service inside the VM:
+## 6. Run the harmless Windows simulation
 
 ```powershell
-Restart-Service WazuhSvc
-Get-Service WazuhSvc
+& $vmrun -T ws -gu $guestUser -gp $guestPassword `
+  copyFileFromHostToGuest $client `
+  '.\scripts\run-safe-powershell-simulation.ps1' `
+  'C:\Users\Public\run-safe-powershell-simulation.ps1'
+
+& $vmrun -T ws -gu $guestUser -gp $guestPassword `
+  runProgramInGuest $client `
+  'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe' `
+  -NoProfile -ExecutionPolicy Bypass `
+  -File 'C:\Users\Public\run-safe-powershell-simulation.ps1'
 ```
 
-This does not restart the Windows host or the Windows guest operating system.
+The simulation creates one marker file, resolves the internal server name, and tests TCP/443 against the Wazuh VM. It does not download or execute payloads.
+
+## 7. Run limited reconnaissance from Kali
+
+Inside `KALI01`:
+
+```bash
+nmap -sT -Pn -p 135,139,445,3389 192.168.75.132 \
+  -oN /tmp/kali-nmap-scan.txt
+```
+
+Meaning of the options:
+
+- `-sT`: standard TCP connect scan.
+- `-Pn`: do not depend on ICMP ping discovery.
+- `-p`: test only the four listed Windows ports.
+- `-oN`: save readable evidence.
+
+Result: the Windows host was up and all four ports were `filtered`.
+
+## 8. Collect Windows evidence
+
+```powershell
+Get-WinEvent -FilterHashtable @{
+  LogName = 'Microsoft-Windows-Sysmon/Operational'
+  StartTime = (Get-Date).AddMinutes(-30)
+} | Where-Object Id -in 1,3,11,12,13,14,22
+```
+
+Validated events:
+
+```text
+Event ID 1   powershell.exe process creation
+Event ID 11  C:\Lab\wazuh-detection-test.txt creation
+Event ID 3   internal connection to 192.168.75.20:443
+```
+
+Wazuh agent log validation:
+
+```text
+Analyzing event log: Microsoft-Windows-Sysmon/Operational
+Analyzing event log: Microsoft-Windows-PowerShell/Operational
+Connected to the server: 192.168.75.20:1514/tcp
+Agent is now online
+```
+
+## 9. Update the Sysmon configuration
+
+After removing an overly broad internal-network filter, apply the focused configuration again:
+
+```powershell
+C:\LabTools\Sysmon\Sysmon64.exe `
+  -accepteula -c C:\LabTools\Sysmon\sysmon-lab.xml
+```
+
+This keeps the useful PowerShell, command-shell, file, registry, and DNS telemetry while reducing background noise.
+
+## 10. Stop the lab when finished
+
+Use guest shutdowns when convenient; do not force-stop a VM that is writing data:
+
+```powershell
+& $vmrun stop $kali soft
+& $vmrun stop $client soft
+& $vmrun stop $wazuh soft
+```
+
+This step is optional and was not used while the lab was being validated.

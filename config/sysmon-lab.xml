@@ -1,0 +1,49 @@
+<Sysmon schemaversion="4.90">
+  <HashAlgorithms>SHA256</HashAlgorithms>
+  <CheckRevocation />
+  <EventFiltering>
+    <RuleGroup name="Lab process creation" groupRelation="or">
+      <ProcessCreate onmatch="include">
+        <Image condition="end with">\powershell.exe</Image>
+        <Image condition="end with">\pwsh.exe</Image>
+        <Image condition="end with">\cmd.exe</Image>
+        <Image condition="end with">\wscript.exe</Image>
+        <Image condition="end with">\cscript.exe</Image>
+        <Image condition="end with">\rundll32.exe</Image>
+        <Image condition="end with">\reg.exe</Image>
+        <Image condition="end with">\net.exe</Image>
+        <Image condition="end with">\net1.exe</Image>
+      </ProcessCreate>
+    </RuleGroup>
+
+    <RuleGroup name="Lab network connections" groupRelation="or">
+      <NetworkConnect onmatch="include">
+        <Image condition="end with">\powershell.exe</Image>
+        <Image condition="end with">\pwsh.exe</Image>
+        <Image condition="end with">\cmd.exe</Image>
+        <Image condition="end with">\curl.exe</Image>
+      </NetworkConnect>
+    </RuleGroup>
+
+    <RuleGroup name="Lab file creation" groupRelation="or">
+      <FileCreate onmatch="include">
+        <TargetFilename condition="begin with">C:\Lab\</TargetFilename>
+        <TargetFilename condition="contains">\Start Menu\Programs\Startup\</TargetFilename>
+      </FileCreate>
+    </RuleGroup>
+
+    <RuleGroup name="Persistence-related registry paths" groupRelation="or">
+      <RegistryEvent onmatch="include">
+        <TargetObject condition="contains">\Software\Microsoft\Windows\CurrentVersion\Run</TargetObject>
+        <TargetObject condition="contains">\Software\Microsoft\Windows\CurrentVersion\RunOnce</TargetObject>
+      </RegistryEvent>
+    </RuleGroup>
+
+    <RuleGroup name="PowerShell DNS activity" groupRelation="or">
+      <DnsQuery onmatch="include">
+        <Image condition="end with">\powershell.exe</Image>
+        <Image condition="end with">\pwsh.exe</Image>
+      </DnsQuery>
+    </RuleGroup>
+  </EventFiltering>
+</Sysmon>

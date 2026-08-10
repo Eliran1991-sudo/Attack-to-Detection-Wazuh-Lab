@@ -1,0 +1,11 @@
+# Nmap 7.99 scan initiated Mon Aug 10 01:35:49 2026 as: /usr/lib/nmap/nmap --privileged -sT -Pn -p 135,139,445,3389 -oN /tmp/kali-nmap-scan.txt 192.168.75.132
+Nmap scan report for 192.168.75.132
+Host is up.
+
+PORT     STATE    SERVICE
+135/tcp  filtered msrpc
+139/tcp  filtered netbios-ssn
+445/tcp  filtered microsoft-ds
+3389/tcp filtered ms-wbt-server
+
+# Nmap done at Mon Aug 10 01:35:56 2026 -- 1 IP address (1 host up) scanned in 7.52 seconds

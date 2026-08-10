@@ -1,0 +1,31 @@
+Attack-to-Detection Lab - Sanitized Validation Summary
+
+Windows endpoint
+- Host: WIN11-CLIENT (192.168.75.132)
+- Sysmon64: Running / Automatic
+- WazuhSvc: Running / Automatic
+- Sysmon signature: Valid, Microsoft Windows Publisher
+- Sysmon channel: Enabled
+
+Detected simulation events
+- Event ID 1: powershell.exe started the authorized simulation
+- Event ID 11: C:\Lab\wazuh-detection-test.txt created by powershell.exe
+- Event ID 3: internal TCP connection to 192.168.75.20:443
+
+Wazuh pipeline
+- Sysmon Operational channel analyzed
+- PowerShell Operational channel analyzed
+- Connected to 192.168.75.20:1514/tcp
+- Agent reported online
+
+Kali reconnaissance
+- Source: KALI01 (192.168.75.129)
+- Target: WIN11-CLIENT (192.168.75.132)
+- Ports: 135, 139, 445, 3389
+- Result: target online; all tested ports filtered
+
+Safety
+- Private VMware network only
+- No public targets
+- No exploit or malware
+- No credentials stored in the repository

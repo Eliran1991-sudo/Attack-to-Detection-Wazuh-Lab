@@ -21,6 +21,8 @@ wazuh-install-files*
 *.log
 evidence/private/
 captures/private/
+tools/
+evidence/private/
 
 # Temporary files
 *.tmp

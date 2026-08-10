@@ -1,0 +1,3 @@
+SIMULATION=Completed
+MARKER_FILE=C:\Lab\wazuh-detection-test.txt
+TIMESTAMP_UTC=2026-08-10T15:31:59.6987962Z

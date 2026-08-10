@@ -1,0 +1,7 @@
+SYSMON_ACTION=Configuration updated
+SYSMON_SIGNATURE=Valid
+SYSMON_SIGNER=CN=Microsoft Windows Publisher, O=Microsoft Corporation, L=Redmond, S=Washington, C=US
+SYSMON_SERVICE=Running
+SYSMON_LOG_ENABLED=True
+WAZUH_CONFIG_CHANGED=False
+WAZUH_SERVICE=Running

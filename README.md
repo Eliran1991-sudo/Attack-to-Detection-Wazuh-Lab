@@ -1,60 +1,61 @@
-# Attack-to-Detection Lab with Kali, Windows, Sysmon, and Wazuh
+# Attack-to-Detection Lab: Kali, Windows, Sysmon, and Wazuh
 
-This project follows a complete purple-team workflow: generate controlled activity from an isolated attack host, collect endpoint telemetry from Windows, detect it in Wazuh, and document the SOC investigation.
+This project demonstrates a complete, safe purple-team workflow in an isolated VMware network: controlled reconnaissance from Kali, endpoint telemetry on Windows 11, collection by Wazuh, and evidence-based SOC triage.
 
-## Objective
-
-Demonstrate the full chain from attacker activity to analyst decision:
-
-1. Generate safe and authorized activity in an isolated VMware network.
-2. Collect enhanced Windows telemetry with Sysmon and the Wazuh agent.
-3. Detect authentication failures, process execution, network scanning, and file changes.
-4. Correlate events with MITRE ATT&CK.
-5. Produce evidence-based incident reports.
-
-## Planned architecture
+## What was built
 
 ```mermaid
 flowchart LR
-    K[KALI01\nAttack simulation] -->|Controlled tests| C[WIN11-CLIENT\nSysmon + Wazuh Agent]
-    C -->|Security and Sysmon events| W[WAZUH-SIEM01\nManager + Indexer + Dashboard]
-    W --> A[SOC triage and incident report]
+    K["KALI01\n192.168.75.129"] -->|"Limited Nmap scan"| C["WIN11-CLIENT\n192.168.75.132"]
+    C -->|"Sysmon + PowerShell events"| A["Wazuh Agent 001"]
+    A -->|"TCP 1514"| W["WAZUH-SIEM01\n192.168.75.20"]
+    W --> T["SOC evidence and triage"]
 ```
 
-All systems communicate only through the private `VMnet1` laboratory network.
+All three systems use the private `VMnet1` laboratory network. No public host or third-party system was scanned.
 
-## Current status
+## Validated results
 
-- [x] Wazuh server verified
-- [x] Windows endpoint verified as active agent `001`
-- [x] Windows account discovered from Wazuh inventory: `SOC Analyst`
-- [x] Existing Windows Event IDs `4625` and `4688` validated
-- [ ] Authenticate to the Windows guest for controlled administration
-- [ ] Install and configure Sysmon
-- [ ] Verify Sysmon Event Channel collection in Wazuh
-- [ ] Start KALI01 and record its isolated IP address
-- [ ] Run controlled Nmap and authentication-failure scenarios
-- [ ] Run a safe PowerShell simulation
-- [ ] Validate detections and create incident reports
+- Microsoft Sysmon installed with a valid Microsoft digital signature.
+- `Sysmon64` and `WazuhSvc` are running automatically.
+- The Wazuh agent analyzes both the Sysmon and PowerShell Operational channels.
+- Wazuh agent `001` connected to `192.168.75.20:1514/tcp` and reported online.
+- Safe PowerShell activity produced:
+  - Sysmon Event ID `1`: process creation.
+  - Sysmon Event ID `11`: file creation under `C:\Lab`.
+  - Sysmon Event ID `3`: network connection to the internal Wazuh server.
+- Kali ran a limited Nmap scan against four Windows ports. The host was reachable and every tested port was filtered.
 
 ## Detection scenarios
 
-| Scenario | Expected telemetry | SOC objective |
+| Scenario | Evidence | Analyst conclusion |
 |---|---|---|
-| Nmap scan from Kali | Sysmon network connections and Windows firewall events | Identify reconnaissance |
-| Failed authentication | Windows Security Event ID 4625 | Triage repeated login failures |
-| PowerShell test command | PowerShell Operational logs and Sysmon process creation | Detect suspicious command execution |
-| Monitored file creation | Sysmon file events and Wazuh FIM | Validate endpoint file monitoring |
+| PowerShell execution | Sysmon Event ID 1 | Command execution was captured with user, integrity level, command line, and SHA-256 hash |
+| Marker-file creation | Sysmon Event ID 11 | Endpoint file activity under the lab path was captured |
+| Internal connection test | Sysmon Event ID 3 | Network telemetry recorded the Windows-to-Wazuh connection |
+| Kali reconnaissance | Nmap evidence | Windows was online; firewall filtering protected the tested services |
 
-## Command-by-command record
+## Repository structure
 
-Every host and guest command is documented in [docs/commands.md](docs/commands.md). Passwords, enrollment keys, and private keys are never recorded.
+```text
+config/       Focused Sysmon configuration
+scripts/      Installation, simulation, and evidence-collection scripts
+docs/         Command log and incident report
+evidence/     Sanitized validation results
+```
 
-## Safety rules
+## Reproduce the lab
 
-- Use only the isolated local lab.
-- Do not target public IP addresses or third-party systems.
-- Use harmless simulation commands rather than malware.
-- Do not disable security controls to make a test succeed.
-- Do not store credentials in Git or screenshots.
+Follow [docs/commands.md](docs/commands.md). Credentials are always supplied at runtime and are deliberately excluded from every file in this repository.
 
+## Safety boundaries
+
+- Run only inside the authorized local lab.
+- Do not replace the target IP with a public or third-party address.
+- Use the harmless simulation script; no malware or exploit code is included.
+- Do not disable Windows Defender or the firewall.
+- Never commit credentials, enrollment keys, VM disks, or raw private logs.
+
+## Skills demonstrated
+
+Windows telemetry, Sysmon, Wazuh agent configuration, Nmap reconnaissance, PowerShell, event triage, evidence handling, MITRE ATT&CK mapping, Git, and security-focused documentation.
