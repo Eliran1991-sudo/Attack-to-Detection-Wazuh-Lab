@@ -16,6 +16,12 @@ This project demonstrates a complete, safe purple-team workflow in an isolated V
 
 ## Evidence gallery
 
+### Windows endpoint telemetry
+
+Live collection from `WIN11-CLIENT` confirms Sysmon process-creation telemetry (Event ID `1`) and verifies that both Sysmon and the Wazuh agent are running automatically.
+
+![Windows Sysmon event and security agent status](docs/images/windows-endpoint-evidence.png)
+
 ### Confirmed Wazuh detection
 
 The manager received real Sysmon telemetry from `WIN11-CLIENT` and matched custom rule `100100` at level `10`, mapped to MITRE ATT&CK `T1059.001`.
