@@ -2,6 +2,18 @@
 
 This project demonstrates a complete, safe purple-team workflow in an isolated VMware network: controlled reconnaissance from Kali, endpoint telemetry on Windows 11, collection by Wazuh, and evidence-based SOC triage.
 
+## Recruiter quick view
+
+| Area | Demonstrated outcome |
+|---|---|
+| Detection engineering | Created and validated Wazuh rule `100100` at alert level `10` |
+| Endpoint telemetry | Collected Sysmon process, file-creation, and network events |
+| SOC investigation | Preserved sanitized evidence and documented analyst conclusions |
+| Threat mapping | Mapped the activity to MITRE ATT&CK techniques |
+| Safe attack simulation | Ran limited reconnaissance only inside an isolated VMware network |
+
+**Start here:** [Incident report](docs/incident-report.md) · [Command log](docs/commands.md) · [Detection evidence](evidence/detection-summary.txt)
+
 ## What was built
 
 ```mermaid
@@ -62,3 +74,7 @@ Follow [docs/commands.md](docs/commands.md). Credentials are always supplied at 
 ## Skills demonstrated
 
 Windows telemetry, Sysmon, custom Wazuh rules, Wazuh agent configuration, Nmap reconnaissance, PowerShell, event triage, evidence handling, MITRE ATT&CK mapping, Git, and security-focused documentation.
+
+## Portfolio progression
+
+This project extends the foundational [Windows SOC Home Lab with Wazuh](https://github.com/Eliran1991-sudo/SOC-Lab-Portfolio) by adding Sysmon telemetry, controlled Kali reconnaissance, custom detection logic, and deeper incident analysis.
