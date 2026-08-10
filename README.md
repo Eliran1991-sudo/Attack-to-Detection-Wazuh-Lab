@@ -14,6 +14,26 @@ This project demonstrates a complete, safe purple-team workflow in an isolated V
 
 **Start here:** [Incident report](docs/incident-report.md) · [Command log](docs/commands.md) · [Detection evidence](evidence/detection-summary.txt)
 
+## Evidence gallery
+
+### Confirmed Wazuh detection
+
+The manager received real Sysmon telemetry from `WIN11-CLIENT` and matched custom rule `100100` at level `10`, mapped to MITRE ATT&CK `T1059.001`.
+
+![Wazuh custom PowerShell detection](docs/images/wazuh-detection-alert.png)
+
+### Wazuh services and endpoint status
+
+Manager, indexer, and dashboard services are active, and agent `001` reports as active.
+
+![Wazuh server and active agent status](docs/images/wazuh-server-status.png)
+
+### Controlled Kali reconnaissance
+
+The scan targeted only the isolated Windows VM. The endpoint was reachable and the selected Windows service ports were filtered.
+
+![Authorized Kali Nmap scan against the Windows lab endpoint](docs/images/kali-nmap-scan.png)
+
 ## What was built
 
 ```mermaid
