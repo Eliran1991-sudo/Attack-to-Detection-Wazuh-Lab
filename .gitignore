@@ -1,0 +1,27 @@
+# Secrets
+*.key
+*.pem
+*.pfx
+*.p12
+*password*
+*secret*
+client.keys
+wazuh-install-files*
+
+# Virtual machine artifacts
+*.vmdk
+*.vmem
+*.vmss
+*.vmsn
+*.vmx
+*.nvram
+*.lck
+
+# Raw logs and private captures
+*.log
+evidence/private/
+captures/private/
+
+# Temporary files
+*.tmp
+*.bak
