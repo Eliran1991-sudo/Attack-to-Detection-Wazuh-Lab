@@ -6,7 +6,7 @@ $installDirectory = 'C:\LabTools\Sysmon'
 $configTarget = Join-Path $installDirectory 'sysmon-lab.xml'
 $sysmonExecutable = Join-Path $installDirectory 'Sysmon64.exe'
 $wazuhConfig = 'C:\Program Files (x86)\ossec-agent\ossec.conf'
-$resultFile = 'C:\Users\Public\codex-sysmon-result.txt'
+$resultFile = 'C:\Users\Public\sysmon-validation-result.txt'
 
 New-Item -ItemType Directory -Path $installDirectory -Force | Out-Null
 Expand-Archive -LiteralPath $package -DestinationPath $installDirectory -Force
@@ -56,7 +56,7 @@ foreach ($channel in $channels) {
 }
 
 if ($changedWazuhConfig) {
-    $backup = "$wazuhConfig.codex-backup"
+    $backup = "$wazuhConfig.lab-backup"
     Copy-Item -LiteralPath $wazuhConfig -Destination $backup -Force
     [IO.File]::WriteAllText($wazuhConfig, $wazuhText, [Text.UTF8Encoding]::new($false))
 }

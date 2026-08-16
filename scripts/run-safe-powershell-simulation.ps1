@@ -17,4 +17,4 @@ Test-NetConnection -ComputerName '192.168.75.20' -Port 443 -InformationLevel Qui
     'SIMULATION=Completed'
     "MARKER_FILE=$markerFile"
     "TIMESTAMP_UTC=$([DateTime]::UtcNow.ToString('o'))"
-) | Set-Content -LiteralPath 'C:\Users\Public\codex-simulation-result.txt'
+) | Set-Content -LiteralPath 'C:\Users\Public\lab-simulation-result.txt'

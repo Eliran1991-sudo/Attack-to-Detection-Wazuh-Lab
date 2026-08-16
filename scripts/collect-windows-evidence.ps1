@@ -1,7 +1,7 @@
 $ErrorActionPreference = 'Stop'
 
 $since = (Get-Date).AddMinutes(-30)
-$output = 'C:\Users\Public\codex-windows-evidence.txt'
+$output = 'C:\Users\Public\windows-soc-evidence.txt'
 
 $sysmonEvents = Get-WinEvent -FilterHashtable @{
     LogName   = 'Microsoft-Windows-Sysmon/Operational'
