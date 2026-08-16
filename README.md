@@ -101,6 +101,7 @@ Follow [docs/commands.md](docs/commands.md). Credentials are always supplied at 
 
 Windows telemetry, Sysmon, custom Wazuh rules, Wazuh agent configuration, Nmap reconnaissance, PowerShell, event triage, evidence handling, MITRE ATT&CK mapping, Git, and security-focused documentation.
 
-## Portfolio progression
+## Related projects
 
-This project extends the foundational [Windows SOC Home Lab with Wazuh](https://github.com/Eliran1991-sudo/SOC-Lab-Portfolio) by adding Sysmon telemetry, controlled Kali reconnaissance, custom detection logic, and deeper incident analysis.
+- [Windows SOC Home Lab with Wazuh](https://github.com/Eliran1991-sudo/SOC-Lab-Portfolio): the foundational project covering Wazuh deployment, endpoint onboarding, Windows event collection, and failed-logon triage.
+- [Incident Report Template](docs/incident-report-template.md): reusable structure for future evidence-based investigations.
