@@ -14,14 +14,16 @@ An authorized simulation was performed inside the private `192.168.75.0/24` VMwa
 
 ## Timeline
 
-| Time (UTC) | Activity | Evidence |
+| Recorded time | Activity | Evidence |
 |---|---|---|
 | 15:31:48 | PowerShell simulation started | Sysmon Event ID 1 |
 | 15:31:49 | Marker file created | Sysmon Event ID 11 |
 | 15:32:33 | TCP/443 connection test reached Wazuh | Sysmon Event ID 3 |
-| 15:35:49 | Kali began limited Nmap scan | `evidence/kali-nmap-scan.txt` |
-| 15:35:56 | Nmap scan completed | Four ports reported filtered |
-| 11:27:55 server time | Custom SIEM detection matched | Wazuh rule 100100, level 10 |
+| 01:35:49, source timezone not recorded | Kali began the scan preserved in the text evidence | `evidence/kali-nmap-scan.txt` |
+| 01:35:56, source timezone not recorded | Preserved Nmap scan completed | Four ports reported filtered |
+| 11:27:55 server local time, 08:27:55 UTC in the dashboard | Custom SIEM detection matched | Wazuh rule 100100, level 10 |
+
+The Nmap gallery image documents a separate authorized validation run at 05:06 EDT. It is not the same run preserved in `evidence/kali-nmap-scan.txt`.
 
 ## Findings
 

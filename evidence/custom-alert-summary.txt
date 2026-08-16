@@ -1,6 +1,7 @@
 Wazuh Custom Detection - Sanitized Evidence
 
-Timestamp: 2026-08-10 11:27:55 (Wazuh server time)
+Timestamp: 2026-08-10 11:27:55 (server local time)
+Dashboard timestamp: 2026-08-10 08:27:55 UTC
 Agent: WIN11-CLIENT
 Rule ID: 100100
 Level: 10

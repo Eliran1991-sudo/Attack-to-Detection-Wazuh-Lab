@@ -12,7 +12,7 @@ if [[ ! -f "$source_rule" ]]; then
 fi
 
 if [[ -f "$target_rule" ]]; then
-  cp -a "$target_rule" "${target_rule}.codex-backup"
+  cp -a "$target_rule" "${target_rule}.lab-backup"
 fi
 
 install -o root -g wazuh -m 0640 "$source_rule" "$target_rule"
@@ -20,8 +20,8 @@ install -o root -g wazuh -m 0640 "$source_rule" "$target_rule"
 rm -f "$validation" "$result"
 
 if ! /var/ossec/bin/wazuh-analysisd -t > "$validation" 2>&1; then
-  if [[ -f "${target_rule}.codex-backup" ]]; then
-    cp -a "${target_rule}.codex-backup" "$target_rule"
+  if [[ -f "${target_rule}.lab-backup" ]]; then
+    cp -a "${target_rule}.lab-backup" "$target_rule"
   else
     rm -f "$target_rule"
   fi
@@ -38,4 +38,6 @@ systemctl restart wazuh-manager
   echo "MANAGER_STATUS=$(systemctl is-active wazuh-manager)"
 } > "$result"
 
-chown eliran:eliran "$result" "$validation"
+if [[ -n "${SUDO_USER:-}" ]]; then
+  chown "$SUDO_USER":"$(id -gn "$SUDO_USER")" "$result" "$validation"
+fi

@@ -23,4 +23,6 @@ rm -f "$output" /tmp/wazuh-lab-alerts.jsonl
 grep -Ei 'sysmon|powershell|WIN11-CLIENT|agent 001' "$alerts" | tail -n 80 \
   > /tmp/wazuh-lab-alerts.jsonl || true
 
-chown eliran:eliran "$output" /tmp/wazuh-lab-alerts.jsonl
+if [[ -n "${SUDO_USER:-}" ]]; then
+  chown "$SUDO_USER":"$(id -gn "$SUDO_USER")" "$output" /tmp/wazuh-lab-alerts.jsonl
+fi
