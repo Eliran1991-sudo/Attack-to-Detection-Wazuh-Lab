@@ -103,5 +103,5 @@ Windows telemetry, Sysmon, custom Wazuh rules, Wazuh agent configuration, Nmap r
 
 ## Related projects
 
-- [Windows SOC Home Lab with Wazuh](https://github.com/Eliran1991-sudo/SOC-Lab-Portfolio): the foundational project covering Wazuh deployment, endpoint onboarding, Windows event collection, and failed-logon triage.
+- [Wazuh SOC Lab](https://github.com/Eliran1991-sudo/SOC-Lab-Portfolio): the foundational project covering Wazuh deployment, endpoint onboarding, Windows event collection, and failed-logon triage.
 - [Incident Report Template](docs/incident-report-template.md): reusable structure for future evidence-based investigations.
